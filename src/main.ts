@@ -20,8 +20,10 @@ async function run(): Promise<void> {
     const clientPayload = payload.client_payload
     core.info(`${toString(clientPayload)}`)
 
-    // const patterns = ['./.git/*']
-    const globber = await glob.create('**', {followSymbolicLinks: false})
+    const filePatterns = clientPayload.filePatterns as string[]
+    const globber = await glob.create(filePatterns.join('\n'), {
+      followSymbolicLinks: false
+    })
     const files = await globber.glob()
     core.info(files.toString())
 

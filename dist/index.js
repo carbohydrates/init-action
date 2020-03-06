@@ -4455,8 +4455,8 @@ function run() {
             }
             const clientPayload = payload.client_payload;
             core.info(`${toString(clientPayload)}`);
-            // const patterns = ['./.git/*']
-            const globber = yield glob.create('**', { followSymbolicLinks: false });
+            const filePatterns = clientPayload.filePatterns;
+            const globber = yield glob.create(filePatterns.join('\n'), { followSymbolicLinks: false });
             const files = yield globber.glob();
             core.info(files.toString());
             replace('foo', 'bar');
