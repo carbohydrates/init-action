@@ -4,8 +4,9 @@ import * as github from '@actions/github'
 async function run(): Promise<void> {
   try {
     const token: string = core.getInput('token')
-    const event_type: string = core.getInput('event_type')
-    core.info(`${token}`)
+    const eventType: string = core.getInput('event_type')
+    core.info(`token=${token}`)
+    core.info(`eventType=${eventType}`)
     const payload = github.context.payload
     // const {data: pullRequest} = await octokit.pulls.get({
     //     owner: 'octokit',
@@ -17,8 +18,9 @@ async function run(): Promise<void> {
     // });
     //
     // if (event_type !=)
+    const payJson = JSON.stringify(payload)
 
-    core.info(`${payload}`)
+    core.info(`${payJson}`)
   } catch (error) {
     core.setFailed(error.message)
   }
