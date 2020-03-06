@@ -3513,17 +3513,17 @@ const github = __importStar(__webpack_require__(469));
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const token = core.getInput('token');
+            // const token: string = core.getInput('token')
             const eventType = core.getInput('event_type');
-            core.info(`token=${token}`);
-            core.info(`eventType=${eventType}`);
             const payload = github.context.payload;
+            core.info(`Processing payload`);
+            core.info(`${JSON.stringify(payload)}`);
             if (eventType !== payload.action) {
-                core.info(`Expected event: ${eventType}
-             Received Event: ${payload.action}
-             Skipping event...`);
+                core.info(`Expected event: ${eventType} \n Received Event: ${payload.action} \n Skipping event...`);
                 return yield Promise.resolve();
             }
+            const clientPayload = payload.client_payload;
+            core.info(`${clientPayload}`);
             // const {data: pullRequest} = await octokit.pulls.get({
             //     owner: 'octokit',
             //     repo: 'rest.js',
@@ -3534,8 +3534,6 @@ function run() {
             // });
             //
             // if (event_type !=)
-            const payJson = JSON.stringify(payload);
-            core.info(`${payJson}`);
         }
         catch (error) {
             core.setFailed(error.message);

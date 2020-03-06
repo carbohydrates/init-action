@@ -22,4 +22,4 @@ jobs:
     - uses: ./
       with:
         destroy_after_execution: "false"
-        token: "dfsdsdfdf"
+        token: ${{ secrets.GITHUB_TOKEN }}
