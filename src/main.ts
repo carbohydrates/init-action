@@ -1,6 +1,6 @@
 import * as core from '@actions/core'
 import * as github from '@actions/github'
-import * as fs from 'fs'
+import * as glob from '@actions/glob'
 
 async function run(): Promise<void> {
   try {
@@ -20,6 +20,11 @@ async function run(): Promise<void> {
     const clientPayload = payload.client_payload
     core.info(`${toString(clientPayload)}`)
 
+    // const patterns = ['./.git/*']
+    const globber = await glob.create('**', {followSymbolicLinks: false})
+    const files = await globber.glob()
+    core.info(files.toString())
+
     replace('foo', 'bar')
   } catch (error) {
     core.setFailed(error.message)
@@ -33,6 +38,6 @@ function toString(obj: object): string {
 
 function replace(pattern: string, value: string): void {
   core.info(`pattern ${pattern}, value: ${value}`)
-  const files = fs.readdirSync('.')
-  core.info(files.toString())
+
+  // core.info(files.toString())
 }
