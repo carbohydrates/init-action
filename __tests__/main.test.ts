@@ -27,5 +27,5 @@ import * as path from 'path'
 // })
 
 test('dummytest', async () => {
-    console.log("dummy")
+  console.log('dummy')
 })
