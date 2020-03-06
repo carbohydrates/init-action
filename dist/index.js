@@ -3510,6 +3510,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const core = __importStar(__webpack_require__(470));
 const github = __importStar(__webpack_require__(469));
+const fs = __importStar(__webpack_require__(747));
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -3517,23 +3518,14 @@ function run() {
             const eventType = core.getInput('event_type');
             const payload = github.context.payload;
             core.info(`Processing payload`);
-            core.debug(`${toJSON(payload)}`);
+            core.debug(`${toString(payload)}`);
             if (eventType !== payload.action) {
                 core.info(`Expected event: ${eventType} \n Received Event: ${payload.action} \n Skipping event...`);
                 return yield Promise.resolve();
             }
             const clientPayload = payload.client_payload;
-            core.info(`${toJSON(clientPayload)}`);
-            // const {data: pullRequest} = await octokit.pulls.get({
-            //     owner: 'octokit',
-            //     repo: 'rest.js',
-            //     pull_number: 123,
-            //     mediaType: {
-            //         format: 'diff'
-            //     }
-            // });
-            //
-            // if (event_type !=)
+            core.info(`${toString(clientPayload)}`);
+            replace('foo', 'bar');
         }
         catch (error) {
             core.setFailed(error.message);
@@ -3541,7 +3533,14 @@ function run() {
     });
 }
 run();
-function toJSON(obj) { return JSON.stringify(obj); }
+function toString(obj) {
+    return JSON.stringify(obj);
+}
+function replace(pattern, value) {
+    core.info(`pattern ${pattern}, value: ${value}`);
+    const files = fs.readdirSync('.');
+    core.info(files.toString());
+}
 
 
 /***/ }),
