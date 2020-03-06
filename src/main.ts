@@ -8,7 +8,7 @@ async function run(): Promise<void> {
     const payload = github.context.payload
 
     core.info(`Processing payload`)
-    core.debug(`${JSON.stringify(payload)}`)
+    core.debug(`${toJSON(payload)}`)
     if (eventType !== payload.action) {
       core.info(
         `Expected event: ${eventType} \n Received Event: ${payload.action} \n Skipping event...`
@@ -17,7 +17,7 @@ async function run(): Promise<void> {
     }
 
     const clientPayload = payload.client_payload
-    core.info(`${clientPayload.toString()}`)
+    core.info(`${toJSON(clientPayload)}`)
     // const {data: pullRequest} = await octokit.pulls.get({
     //     owner: 'octokit',
     //     repo: 'rest.js',
@@ -34,3 +34,7 @@ async function run(): Promise<void> {
 }
 
 run()
+
+function toJSON(obj: object): string {
+  return JSON.stringify(obj)
+}

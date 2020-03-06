@@ -3517,13 +3517,13 @@ function run() {
             const eventType = core.getInput('event_type');
             const payload = github.context.payload;
             core.info(`Processing payload`);
-            core.debug(`${JSON.stringify(payload)}`);
+            core.debug(`${toJSON(payload)}`);
             if (eventType !== payload.action) {
                 core.info(`Expected event: ${eventType} \n Received Event: ${payload.action} \n Skipping event...`);
                 return yield Promise.resolve();
             }
             const clientPayload = payload.client_payload;
-            core.info(`${clientPayload.toString()}`);
+            core.info(`${toJSON(clientPayload)}`);
             // const {data: pullRequest} = await octokit.pulls.get({
             //     owner: 'octokit',
             //     repo: 'rest.js',
@@ -3541,6 +3541,7 @@ function run() {
     });
 }
 run();
+function toJSON(obj) { return JSON.stringify(obj); }
 
 
 /***/ }),
