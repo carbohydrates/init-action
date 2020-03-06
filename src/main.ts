@@ -18,7 +18,7 @@ async function run(): Promise<void> {
     }
 
     const clientPayload = payload.client_payload
-    core.info(`${clientPayload}`)
+    core.info(`${clientPayload.toString()}`)
     // const {data: pullRequest} = await octokit.pulls.get({
     //     owner: 'octokit',
     //     repo: 'rest.js',

@@ -3523,7 +3523,7 @@ function run() {
                 return yield Promise.resolve();
             }
             const clientPayload = payload.client_payload;
-            core.info(`${clientPayload}`);
+            core.info(`${clientPayload.toString()}`);
             // const {data: pullRequest} = await octokit.pulls.get({
             //     owner: 'octokit',
             //     repo: 'rest.js',
