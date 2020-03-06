@@ -4454,9 +4454,11 @@ function run() {
                 return yield Promise.resolve();
             }
             const clientPayload = payload.client_payload;
-            core.info(`${toString(clientPayload)}`);
+            core.info(`Processing client payload: ${toString(clientPayload)}`);
             const filePatterns = clientPayload.filePatterns;
-            const globber = yield glob.create(filePatterns.join('\n'), { followSymbolicLinks: false });
+            const globber = yield glob.create(filePatterns.join('\n'), {
+                followSymbolicLinks: false
+            });
             const files = yield globber.glob();
             core.info(files.toString());
             replace('foo', 'bar');

@@ -18,12 +18,13 @@ async function run(): Promise<void> {
     }
 
     const clientPayload = payload.client_payload
-    core.info(`${toString(clientPayload)}`)
+    core.info(`Processing client payload: ${toString(clientPayload)}`)
 
     const filePatterns = clientPayload.filePatterns as string[]
     const globber = await glob.create(filePatterns.join('\n'), {
       followSymbolicLinks: false
     })
+
     const files = await globber.glob()
     core.info(files.toString())
 
