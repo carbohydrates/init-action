@@ -1,10 +1,21 @@
-name: 'Your name here'
-description: 'Provide a description here'
-author: 'Your name or organization here'
+name: init-action
+description: 'This action is used for one time automation. It took each key from client_payload and replace it to value'
+author: carbohydrates
 inputs:
-  myInput:              # change this
-    description: 'input description here'
-    default: 'default value if applicable'
+  event_type:
+    description: 'event type that action will accept'
+    required: true
+    default: 'init_action'
+  token:
+    description: 'github Private access token from your repo, usually {{ secrets.GITHUB_TOKEN }}'
+    required: true
+  destroy_after_execution:
+    required: true
+    description: 'Destroy the workflow that contains this action after successful execution'
+    default: 'true'
 runs:
   using: 'node12'
   main: 'dist/index.js'
+branding:
+  color: gray-dark
+  icon: loader
