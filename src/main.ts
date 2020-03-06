@@ -8,6 +8,14 @@ async function run(): Promise<void> {
     core.info(`token=${token}`)
     core.info(`eventType=${eventType}`)
     const payload = github.context.payload
+
+    if (eventType !== payload.action) {
+      core.info(`Expected event: ${eventType}
+             Received Event: ${payload.action}
+             Skipping event...`)
+      return await Promise.resolve()
+    }
+
     // const {data: pullRequest} = await octokit.pulls.get({
     //     owner: 'octokit',
     //     repo: 'rest.js',
