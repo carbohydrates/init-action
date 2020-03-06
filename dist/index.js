@@ -3517,7 +3517,7 @@ function run() {
             const eventType = core.getInput('event_type');
             const payload = github.context.payload;
             core.info(`Processing payload`);
-            core.info(`${JSON.stringify(payload)}`);
+            core.debug(`${JSON.stringify(payload)}`);
             if (eventType !== payload.action) {
                 core.info(`Expected event: ${eventType} \n Received Event: ${payload.action} \n Skipping event...`);
                 return yield Promise.resolve();
