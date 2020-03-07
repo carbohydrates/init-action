@@ -4448,20 +4448,24 @@ function run() {
             const eventType = core.getInput('event_type');
             const payload = github.context.payload;
             core.info(`Processing payload`);
-            core.debug(`${toString(payload)}`);
+            core.debug(`Payload is : ${JSON.stringify(payload)}`);
             if (eventType !== payload.action) {
                 core.info(`Expected event: ${eventType} \n Received Event: ${payload.action} \n Skipping event...`);
-                return yield Promise.resolve();
+                return;
             }
             const clientPayload = payload.client_payload;
-            core.info(`Processing client payload: ${toString(clientPayload)}`);
+            core.info(`Processing client payload: ${JSON.stringify(clientPayload)}`);
+            // const toReplace = clientPayload.toReplace as Map<string, string>
             const filePatterns = clientPayload.filePatterns;
             const globber = yield glob.create(filePatterns.join('\n'), {
                 followSymbolicLinks: false
             });
             const files = yield globber.glob();
             core.info(files.toString());
-            replace('foo', 'bar');
+            for (const file of files) {
+                core.info(`Processing file:${file}`);
+                // replace('foo', 'bar')
+            }
         }
         catch (error) {
             core.setFailed(error.message);
@@ -4469,13 +4473,12 @@ function run() {
     });
 }
 run();
-function toString(obj) {
-    return JSON.stringify(obj);
-}
-function replace(pattern, value) {
-    core.info(`pattern ${pattern}, value: ${value}`);
-    // core.info(files.toString())
-}
+// function replace(filePath: string, pattern: string, value: string): void {
+//
+//   core.info(`pattern ${pattern}, value: ${value}`)
+//
+//   // core.info(files.toString())
+// }
 
 
 /***/ }),
