@@ -50,13 +50,13 @@ async function run(): Promise<void> {
     }
 
     // const url = addToken(github.context.ref, token)
-    // await pushChanges(
-    //   'testbot',
-    //   'test@example.com',
-    //   'replace_compleete',
-    //   'init-action',
-    //   url
-    // )
+    await pushChanges(
+      'testbot',
+      'test@example.com',
+      'replace_compleete'
+      // 'init-action',
+      // url
+    )
   } catch (error) {
     core.setFailed(error.message)
   }
@@ -72,21 +72,20 @@ run()
 //   return new Map(JSON.parse(jsonStr));
 // }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function pushChanges(
   authorName: string,
   authorEmail: string,
-  commitMessage: string,
-  branch: string,
-  url: string
+  commitMessage: string
+  // branch: string,
+  // url: string
 ): Promise<void> {
   await core.group('push changes', async () => {
     await exec.exec('git', ['config', 'user.name', authorName])
     await exec.exec('git', ['config', 'user.email', authorEmail])
-    await exec.exec('git', ['checkout', 'HEAD', '-b', branch])
+    // await exec.exec('git', ['checkout', 'HEAD', '-b', branch])
     await exec.exec('git', ['commit', '-am', commitMessage])
-    await exec.exec('git', ['remote', 'set-url', 'origin', url])
-    await exec.exec('git', ['push', 'origin', 'HEAD'])
+    // await exec.exec('git', ['remote', 'set-url', 'origin', url])
+    await exec.exec('git', ['push', 'origin', 'test1'])
   })
 }
 

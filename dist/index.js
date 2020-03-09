@@ -6314,13 +6314,10 @@ function run() {
                 });
             }
             // const url = addToken(github.context.ref, token)
-            // await pushChanges(
-            //   'testbot',
-            //   'test@example.com',
-            //   'replace_compleete',
-            //   'init-action',
-            //   url
-            // )
+            yield pushChanges('testbot', 'test@example.com', 'replace_compleete'
+            // 'init-action',
+            // url
+            );
         }
         catch (error) {
             core.setFailed(error.message);
@@ -6335,16 +6332,18 @@ run();
 // function fromJson(jsonStr) {
 //   return new Map(JSON.parse(jsonStr));
 // }
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function pushChanges(authorName, authorEmail, commitMessage, branch, url) {
+function pushChanges(authorName, authorEmail, commitMessage
+// branch: string,
+// url: string
+) {
     return __awaiter(this, void 0, void 0, function* () {
         yield core.group('push changes', () => __awaiter(this, void 0, void 0, function* () {
             yield exec.exec('git', ['config', 'user.name', authorName]);
             yield exec.exec('git', ['config', 'user.email', authorEmail]);
-            yield exec.exec('git', ['checkout', 'HEAD', '-b', branch]);
+            // await exec.exec('git', ['checkout', 'HEAD', '-b', branch])
             yield exec.exec('git', ['commit', '-am', commitMessage]);
-            yield exec.exec('git', ['remote', 'set-url', 'origin', url]);
-            yield exec.exec('git', ['push', 'origin', 'HEAD']);
+            // await exec.exec('git', ['remote', 'set-url', 'origin', url])
+            yield exec.exec('git', ['push', 'origin', 'test1']);
         }));
     });
 }
