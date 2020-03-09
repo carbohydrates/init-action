@@ -6287,7 +6287,7 @@ function run() {
             const eventType = core.getInput('event_type');
             const payload = github.context.payload;
             core.info(`Processing payload`);
-            core.info(`Payload is : ${JSON.stringify(payload)}`);
+            core.debug(`Payload is : ${JSON.stringify(payload)}`);
             if (eventType !== payload.action) {
                 core.info(`Expected event: ${eventType} \n Received Event: ${payload.action} \n Skipping event...`);
                 return;
@@ -6343,7 +6343,7 @@ function pushChanges(authorName, authorEmail, commitMessage
             // await exec.exec('git', ['checkout', 'HEAD', '-b', branch])
             yield exec.exec('git', ['commit', '-am', commitMessage]);
             // await exec.exec('git', ['remote', 'set-url', 'origin', url])
-            yield exec.exec('git', ['push', 'origin', 'test1']);
+            yield exec.exec('git', ['push']);
         }));
     });
 }

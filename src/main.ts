@@ -12,7 +12,7 @@ async function run(): Promise<void> {
     const payload: WebhookPayload = github.context.payload
 
     core.info(`Processing payload`)
-    core.info(`Payload is : ${JSON.stringify(payload)}`)
+    core.debug(`Payload is : ${JSON.stringify(payload)}`)
 
     if (eventType !== payload.action) {
       core.info(
