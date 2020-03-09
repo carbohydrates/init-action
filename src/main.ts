@@ -43,7 +43,7 @@ async function run(): Promise<void> {
 
     const results = await replace(options)
 
-    core.info(`results: ${results.toString()}`)
+    core.info(`results: ${JSON.stringify(results)}`)
   } catch (error) {
     core.setFailed(error.message)
   }

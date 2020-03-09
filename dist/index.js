@@ -6004,7 +6004,7 @@ function run() {
                 to: ['replace1', 'replace2']
             };
             const results = yield replace_in_file_1.default(options);
-            core.info(`results: ${results.toString()}`);
+            core.info(`results: ${JSON.stringify(results)}`);
         }
         catch (error) {
             core.setFailed(error.message);
