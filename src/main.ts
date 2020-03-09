@@ -1,17 +1,18 @@
 import * as core from '@actions/core'
 import * as github from '@actions/github'
+import * as exec from '@actions/exec'
 import {WebhookPayload} from '@actions/github/lib/interfaces'
 import replace, {ReplaceInFileConfig, ReplaceResult} from 'replace-in-file'
 import * as fs from 'fs'
 
 async function run(): Promise<void> {
   try {
-    // const token: string = core.getInput('token')
+    const token: string = core.getInput('token')
     const eventType: string = core.getInput('event_type')
     const payload: WebhookPayload = github.context.payload
 
     core.info(`Processing payload`)
-    core.debug(`Payload is : ${JSON.stringify(payload)}`)
+    core.info(`Payload is : ${JSON.stringify(payload)}`)
 
     if (eventType !== payload.action) {
       core.info(
@@ -23,7 +24,7 @@ async function run(): Promise<void> {
     interface ClientPayload {
       files: string[]
       ignores: string[]
-      toReplace: object
+      toReplace: {[key: string]: string}
     }
     const clientPayload: ClientPayload = payload.client_payload
     core.info(`Processing client payload: ${JSON.stringify(clientPayload)}`)
@@ -47,6 +48,15 @@ async function run(): Promise<void> {
         core.info(`file is :\n${data}`)
       })
     }
+
+    const url = addToken(github.context.ref, token)
+    await pushChanges(
+      'testbot',
+      'test@example.com',
+      'replace_compleete',
+      'init-action',
+      url
+    )
   } catch (error) {
     core.setFailed(error.message)
   }
@@ -61,3 +71,24 @@ run()
 // function fromJson(jsonStr) {
 //   return new Map(JSON.parse(jsonStr));
 // }
+
+async function pushChanges(
+  authorName: string,
+  authorEmail: string,
+  commitMessage: string,
+  branch: string,
+  url: string
+): Promise<void> {
+  await core.group('push changes', async () => {
+    await exec.exec('git', ['config', 'user.name', authorName])
+    await exec.exec('git', ['config', 'user.email', authorEmail])
+    await exec.exec('git', ['checkout', 'HEAD', '-b', branch])
+    await exec.exec('git', ['commit', '-am', commitMessage])
+    await exec.exec('git', ['remote', 'set-url', 'origin', url])
+    await exec.exec('git', ['push', 'origin', 'HEAD'])
+  })
+}
+
+function addToken(url: string, token: string): string {
+  return url.replace(/^https:\/\//, `https://x-access-token:${token}@`)
+}
