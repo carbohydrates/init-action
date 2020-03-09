@@ -5996,14 +5996,14 @@ function run() {
             }
             const clientPayload = payload.client_payload;
             core.info(`Processing client payload: ${JSON.stringify(clientPayload)}`);
-            const toReplace = new Map(clientPayload.toReplace);
+            const toReplace = new Map(JSON.parse(clientPayload.toReplace));
             core.info(`toreplace is ${toReplace}, ${JSON.stringify(toReplace)}`);
             const from = [];
             const to = [];
-            for (const [placeholder, value] of toReplace) {
-                from.push(placeholder);
-                to.push(value);
-            }
+            // for (const placeholder of toReplace) {
+            //   from.push(placeholder)
+            //   to.push(toReplace[placeholder])
+            // }
             const options = {
                 files: clientPayload.files,
                 ignore: clientPayload.ignores,
@@ -6030,6 +6030,13 @@ function run() {
     });
 }
 run();
+// function toJson(map) {
+//   return JSON.stringify(Array.from(map.entries()));
+// }
+//
+// function fromJson(jsonStr) {
+//   return new Map(JSON.parse(jsonStr));
+// }
 
 
 /***/ }),
