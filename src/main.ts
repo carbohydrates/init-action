@@ -1,7 +1,8 @@
 import * as core from '@actions/core'
 import * as github from '@actions/github'
 import {WebhookPayload} from '@actions/github/lib/interfaces'
-import replace, {ReplaceInFileConfig} from 'replace-in-file'
+import replace, {ReplaceInFileConfig, ReplaceResult} from 'replace-in-file'
+import * as fs from 'fs'
 
 async function run(): Promise<void> {
   try {
@@ -41,9 +42,17 @@ async function run(): Promise<void> {
       to: ['replace1', 'replace2']
     }
 
-    const results = await replace(options)
+    const results: ReplaceResult[] = await replace(options)
 
     core.info(`results: ${JSON.stringify(results)}`)
+    for (const resultInfo of results) {
+      const filePath = resultInfo.file
+      core.info(`info of :${filePath}`)
+      fs.readFile(filePath, (err, data) => {
+        if (err) throw err
+        core.info(`file is : ${data}`)
+      })
+    }
   } catch (error) {
     core.setFailed(error.message)
   }

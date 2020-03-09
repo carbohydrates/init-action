@@ -5981,6 +5981,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const core = __importStar(__webpack_require__(470));
 const github = __importStar(__webpack_require__(469));
 const replace_in_file_1 = __importDefault(__webpack_require__(41));
+const fs = __importStar(__webpack_require__(747));
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -6005,6 +6006,15 @@ function run() {
             };
             const results = yield replace_in_file_1.default(options);
             core.info(`results: ${JSON.stringify(results)}`);
+            for (const resultInfo of results) {
+                const filePath = resultInfo.file;
+                core.info(`info of :${filePath}`);
+                fs.readFile(filePath, (err, data) => {
+                    if (err)
+                        throw err;
+                    core.info(`file is : ${data}`);
+                });
+            }
         }
         catch (error) {
             core.setFailed(error.message);
