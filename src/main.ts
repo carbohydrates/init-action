@@ -7,7 +7,7 @@ import * as fs from 'fs'
 
 async function run(): Promise<void> {
   try {
-    const token: string = core.getInput('token')
+    // const token: string = core.getInput('token')
     const eventType: string = core.getInput('event_type')
     const payload: WebhookPayload = github.context.payload
 
@@ -49,14 +49,14 @@ async function run(): Promise<void> {
       })
     }
 
-    const url = addToken(github.context.ref, token)
-    await pushChanges(
-      'testbot',
-      'test@example.com',
-      'replace_compleete',
-      'init-action',
-      url
-    )
+    // const url = addToken(github.context.ref, token)
+    // await pushChanges(
+    //   'testbot',
+    //   'test@example.com',
+    //   'replace_compleete',
+    //   'init-action',
+    //   url
+    // )
   } catch (error) {
     core.setFailed(error.message)
   }
@@ -72,6 +72,7 @@ run()
 //   return new Map(JSON.parse(jsonStr));
 // }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function pushChanges(
   authorName: string,
   authorEmail: string,
@@ -89,6 +90,7 @@ async function pushChanges(
   })
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function addToken(url: string, token: string): string {
   return url.replace(/^https:\/\//, `https://x-access-token:${token}@`)
 }

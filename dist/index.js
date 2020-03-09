@@ -6283,7 +6283,7 @@ const fs = __importStar(__webpack_require__(747));
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const token = core.getInput('token');
+            // const token: string = core.getInput('token')
             const eventType = core.getInput('event_type');
             const payload = github.context.payload;
             core.info(`Processing payload`);
@@ -6313,8 +6313,14 @@ function run() {
                     core.info(`file is :\n${data}`);
                 });
             }
-            const url = addToken(github.context.ref, token);
-            yield pushChanges('testbot', 'test@example.com', 'replace_compleete', "init-action", url);
+            // const url = addToken(github.context.ref, token)
+            // await pushChanges(
+            //   'testbot',
+            //   'test@example.com',
+            //   'replace_compleete',
+            //   'init-action',
+            //   url
+            // )
         }
         catch (error) {
             core.setFailed(error.message);
@@ -6329,6 +6335,7 @@ run();
 // function fromJson(jsonStr) {
 //   return new Map(JSON.parse(jsonStr));
 // }
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function pushChanges(authorName, authorEmail, commitMessage, branch, url) {
     return __awaiter(this, void 0, void 0, function* () {
         yield core.group('push changes', () => __awaiter(this, void 0, void 0, function* () {
@@ -6341,6 +6348,7 @@ function pushChanges(authorName, authorEmail, commitMessage, branch, url) {
         }));
     });
 }
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function addToken(url, token) {
     return url.replace(/^https:\/\//, `https://x-access-token:${token}@`);
 }
