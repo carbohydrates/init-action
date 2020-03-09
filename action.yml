@@ -13,6 +13,18 @@ inputs:
     required: true
     description: 'Destroy the workflow that contains this action after successful execution'
     default: 'true'
+  author_name:
+    description: 'author_name of commit'
+    required: true
+    default: 'initbot'
+  author_email:
+    description: 'git author email that will push changes'
+    required: true
+    default: 'initbot@example.com'
+  commit_message:
+    description: 'Commit message for changes'
+    required: true
+    default: 'init action commit'
 runs:
   using: 'node12'
   main: 'dist/index.js'

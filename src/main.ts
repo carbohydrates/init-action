@@ -9,6 +9,9 @@ async function run(): Promise<void> {
   try {
     // const token: string = core.getInput('token')
     const eventType: string = core.getInput('event_type')
+    const authorName: string = core.getInput('author_name')
+    const authorEmail: string = core.getInput('author_email')
+    const commitMessage: string = core.getInput('commit_message')
     const payload: WebhookPayload = github.context.payload
 
     core.info(`Processing payload`)
@@ -49,14 +52,7 @@ async function run(): Promise<void> {
       })
     }
 
-    // const url = addToken(github.context.ref, token)
-    await pushChanges(
-      'testbot',
-      'test@example.com',
-      'replace_compleete'
-      // 'init-action',
-      // url
-    )
+    await pushChanges(authorName, authorEmail, commitMessage)
   } catch (error) {
     core.setFailed(error.message)
   }
@@ -64,32 +60,15 @@ async function run(): Promise<void> {
 
 run()
 
-// function toJson(map) {
-//   return JSON.stringify(Array.from(map.entries()));
-// }
-//
-// function fromJson(jsonStr) {
-//   return new Map(JSON.parse(jsonStr));
-// }
-
 async function pushChanges(
   authorName: string,
   authorEmail: string,
   commitMessage: string
-  // branch: string,
-  // url: string
 ): Promise<void> {
   await core.group('push changes', async () => {
     await exec.exec('git', ['config', 'user.name', authorName])
     await exec.exec('git', ['config', 'user.email', authorEmail])
-    // await exec.exec('git', ['checkout', 'HEAD', '-b', branch])
     await exec.exec('git', ['commit', '-am', commitMessage])
-    // await exec.exec('git', ['remote', 'set-url', 'origin', url])
     await exec.exec('git', ['push'])
   })
-}
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function addToken(url: string, token: string): string {
-  return url.replace(/^https:\/\//, `https://x-access-token:${token}@`)
 }

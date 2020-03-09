@@ -6285,6 +6285,9 @@ function run() {
         try {
             // const token: string = core.getInput('token')
             const eventType = core.getInput('event_type');
+            const authorName = core.getInput('author_name');
+            const authorEmail = core.getInput('author_email');
+            const commitMessage = core.getInput('commit_message');
             const payload = github.context.payload;
             core.info(`Processing payload`);
             core.debug(`Payload is : ${JSON.stringify(payload)}`);
@@ -6313,11 +6316,7 @@ function run() {
                     core.info(`file is :\n${data}`);
                 });
             }
-            // const url = addToken(github.context.ref, token)
-            yield pushChanges('testbot', 'test@example.com', 'replace_compleete'
-            // 'init-action',
-            // url
-            );
+            yield pushChanges(authorName, authorEmail, commitMessage);
         }
         catch (error) {
             core.setFailed(error.message);
@@ -6325,31 +6324,15 @@ function run() {
     });
 }
 run();
-// function toJson(map) {
-//   return JSON.stringify(Array.from(map.entries()));
-// }
-//
-// function fromJson(jsonStr) {
-//   return new Map(JSON.parse(jsonStr));
-// }
-function pushChanges(authorName, authorEmail, commitMessage
-// branch: string,
-// url: string
-) {
+function pushChanges(authorName, authorEmail, commitMessage) {
     return __awaiter(this, void 0, void 0, function* () {
         yield core.group('push changes', () => __awaiter(this, void 0, void 0, function* () {
             yield exec.exec('git', ['config', 'user.name', authorName]);
             yield exec.exec('git', ['config', 'user.email', authorEmail]);
-            // await exec.exec('git', ['checkout', 'HEAD', '-b', branch])
             yield exec.exec('git', ['commit', '-am', commitMessage]);
-            // await exec.exec('git', ['remote', 'set-url', 'origin', url])
             yield exec.exec('git', ['push']);
         }));
     });
-}
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function addToken(url, token) {
-    return url.replace(/^https:\/\//, `https://x-access-token:${token}@`);
 }
 
 
