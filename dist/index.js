@@ -5997,6 +5997,7 @@ function run() {
             const clientPayload = payload.client_payload;
             core.info(`Processing client payload: ${JSON.stringify(clientPayload)}`);
             const toReplace = clientPayload.toReplace;
+            core.info(`toreplace is ${toReplace}, ${JSON.stringify(toReplace)}`);
             const from = [];
             const to = [];
             for (const [placeholder, value] of toReplace) {
@@ -6009,7 +6010,7 @@ function run() {
                 allowEmptyPaths: true,
                 countMatches: true,
                 from,
-                to,
+                to
             };
             const results = yield replace_in_file_1.default(options);
             core.info(`results: ${JSON.stringify(results)}`);
