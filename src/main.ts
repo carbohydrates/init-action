@@ -85,7 +85,7 @@ async function pushChanges(
     // await exec.exec('git', ['checkout', 'HEAD', '-b', branch])
     await exec.exec('git', ['commit', '-am', commitMessage])
     // await exec.exec('git', ['remote', 'set-url', 'origin', url])
-    await exec.exec('git', ['push', 'origin', 'test1'])
+    await exec.exec('git', ['push'])
   })
 }
 
