@@ -6289,6 +6289,7 @@ function run() {
             const authorEmail = core.getInput('author_email');
             const commitMessage = core.getInput('commit_message');
             const payload = github.context.payload;
+            core.info(`Processing workload payload: ${github.context.workflow}`);
             core.info(`Processing payload`);
             core.debug(`Payload is : ${JSON.stringify(payload)}`);
             if (eventType !== payload.action) {
@@ -6316,7 +6317,10 @@ function run() {
                     core.info(`file is :\n${data}`);
                 });
             }
-            yield pushChanges(authorName, authorEmail, commitMessage);
+            const push = false;
+            if (push) {
+                yield pushChanges(authorName, authorEmail, commitMessage);
+            }
         }
         catch (error) {
             core.setFailed(error.message);
