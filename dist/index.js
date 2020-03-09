@@ -5996,23 +5996,30 @@ function run() {
             }
             const clientPayload = payload.client_payload;
             core.info(`Processing client payload: ${JSON.stringify(clientPayload)}`);
+            const toReplace = clientPayload.toReplace;
+            const from = [];
+            const to = [];
+            for (const [placeholder, value] of toReplace) {
+                from.push(placeholder);
+                to.push(value);
+            }
             const options = {
                 files: clientPayload.files,
                 ignore: clientPayload.ignores,
                 allowEmptyPaths: true,
                 countMatches: true,
-                from: ['__placeholder1__', '__placeholder2__'],
-                to: ['replace1', 'replace2']
+                from,
+                to,
             };
             const results = yield replace_in_file_1.default(options);
             core.info(`results: ${JSON.stringify(results)}`);
             for (const resultInfo of results) {
                 const filePath = resultInfo.file;
-                core.info(`info of :${filePath}`);
                 fs.readFile(filePath, (err, data) => {
                     if (err)
                         throw err;
-                    core.info(`file is : ${data}`);
+                    core.info(`info of :${filePath}`);
+                    core.info(`file is :\n${data}`);
                 });
             }
         }
