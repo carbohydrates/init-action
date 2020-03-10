@@ -81,6 +81,7 @@ async function pushChanges(
   await core.group('push changes', async () => {
     await exec.exec('git', ['config', 'user.name', authorName])
     await exec.exec('git', ['config', 'user.email', authorEmail])
+    await exec.exec('git', ['add', '-u'])
     await exec.exec('git', ['commit', '-am', commitMessage])
     await exec.exec('git', ['push'])
   })
