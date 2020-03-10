@@ -72,4 +72,4 @@ curl --request POST \
   --data '{"event_type":"init_action","client_payload":{"files":["**/*.yaml"],"ignores":[],"toReplace":{"__PLACEHOLDER1__":"someValue1","__PLACEHOLDER2__":"someValue2","_placeholder1__":"yaaaay"}}}'
 ```
 
-*NOTE:*For private repos you should use Basic Auth with private access token
+*NOTE:* For private repos you should use Basic Auth with private access token
