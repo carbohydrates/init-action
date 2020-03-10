@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: ./
+      - uses: carbohydrates/init-action@v1
         with:
           destroy_after_execution: 'false'
           event_type: 'init_action'
