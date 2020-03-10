@@ -6327,7 +6327,7 @@ run();
 function pushChanges(authorName, authorEmail, commitMessage) {
     return __awaiter(this, void 0, void 0, function* () {
         yield core.group('push changes', () => __awaiter(this, void 0, void 0, function* () {
-            yield exec.exec('git', ['--diff']);
+            yield exec.exec('git', ['diff']);
             yield exec.exec('git', ['config', 'user.name', authorName]);
             yield exec.exec('git', ['config', 'user.email', authorEmail]);
             yield exec.exec('git', ['add', '-u']);
