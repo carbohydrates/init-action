@@ -36,21 +36,22 @@ jobs:
 
 
 ## Triggering the action
-This action is triggered by custom API call https://help.github.com/en/actions/reference/events-that-trigger-workflows#external-events-repository_dispatch
+This action is triggered by custom API call https://help.github.com/en/actions/reference/events-that-trigger-workflows#external-events-repository_dispatch.
+
 __Note: This event will only trigger a workflow run if the workflow file is on the master or default branch.__
 
 ```yaml
 {
-	"event_type": "init_action", 
-	"client_payload": {
-		"files": ["**/*.yaml"],
-		"ignores": [],
-		"toReplace": {
-			"__PLACEHOLDER1__": "someValue1",
-			"__PLACEHOLDER2__": "someValue2",
-			"_placeholder1__" : "yaaaay"
-		}
-	}
+    "event_type": "init_action", 
+    "client_payload": {
+        "files": ["**/*.yaml"],
+        "ignores": [],
+        "toReplace": {
+            "__PLACEHOLDER1__": "someValue1",
+            "__PLACEHOLDER2__": "someValue2",
+            "_placeholder1__" : "yaaaay"
+        }
+    }
 }
 ```
 
