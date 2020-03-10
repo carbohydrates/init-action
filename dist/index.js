@@ -6288,8 +6288,8 @@ function run() {
             const authorName = core.getInput('author_name');
             const authorEmail = core.getInput('author_email');
             const commitMessage = core.getInput('commit_message');
+            const destroyWorkflow = core.getInput('destroy_after_execution');
             const payload = github.context.payload;
-            core.info(`Processing workload payload: ${github.context.workflow}`);
             core.info(`Processing payload`);
             core.debug(`Payload is : ${JSON.stringify(payload)}`);
             if (eventType !== payload.action) {
@@ -6303,23 +6303,28 @@ function run() {
                 ignore: clientPayload.ignores,
                 allowEmptyPaths: true,
                 countMatches: true,
-                from: Object.keys(clientPayload.toReplace),
+                from: Object.keys(clientPayload.toReplace).map(key => `/${key}/g`),
                 to: Object.values(clientPayload.toReplace)
             };
             const results = yield replace_in_file_1.default(options);
             core.info(`results: ${JSON.stringify(results)}`);
             for (const resultInfo of results) {
                 const filePath = resultInfo.file;
-                fs.readFile(filePath, (err, data) => {
-                    if (err)
-                        throw err;
-                    core.info(`info of :${filePath}`);
-                    core.info(`file is :\n${data}`);
-                });
+                if (resultInfo.hasChanged) {
+                    fs.readFile(filePath, (err, data) => {
+                        if (err)
+                            throw err;
+                        core.info(`info of :${filePath}`);
+                        core.info(`file is :\n${data}`);
+                    });
+                }
             }
             const push = false;
             if (push) {
                 yield pushChanges(authorName, authorEmail, commitMessage);
+            }
+            if (destroyWorkflow.toUpperCase() === 'TRUE') {
+                yield wipeWorkflow(github.context.workflow);
             }
         }
         catch (error) {
@@ -6336,6 +6341,12 @@ function pushChanges(authorName, authorEmail, commitMessage) {
             yield exec.exec('git', ['commit', '-am', commitMessage]);
             yield exec.exec('git', ['push']);
         }));
+    });
+}
+function wipeWorkflow(workflow) {
+    return __awaiter(this, void 0, void 0, function* () {
+        // await exec.exec('rm', [workflow])
+        yield exec.exec('echo', [workflow]);
     });
 }
 

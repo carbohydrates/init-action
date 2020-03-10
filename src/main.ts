@@ -12,12 +12,11 @@ async function run(): Promise<void> {
     const authorName: string = core.getInput('author_name')
     const authorEmail: string = core.getInput('author_email')
     const commitMessage: string = core.getInput('commit_message')
+    const destroyWorkflow: string = core.getInput('destroy_after_execution')
     const payload: WebhookPayload = github.context.payload
-    core.info(`Processing workload payload: ${github.context.workflow}`)
 
     core.info(`Processing payload`)
     core.debug(`Payload is : ${JSON.stringify(payload)}`)
-
     if (eventType !== payload.action) {
       core.info(
         `Expected event: ${eventType} \n Received Event: ${payload.action} \n Skipping event...`
@@ -38,7 +37,7 @@ async function run(): Promise<void> {
       ignore: clientPayload.ignores,
       allowEmptyPaths: true,
       countMatches: true,
-      from: Object.keys(clientPayload.toReplace),
+      from: Object.keys(clientPayload.toReplace).map(key => `/${key}/g`),
       to: Object.values(clientPayload.toReplace)
     }
 
@@ -46,16 +45,22 @@ async function run(): Promise<void> {
     core.info(`results: ${JSON.stringify(results)}`)
     for (const resultInfo of results) {
       const filePath = resultInfo.file
-      fs.readFile(filePath, (err, data) => {
-        if (err) throw err
-        core.info(`info of :${filePath}`)
-        core.info(`file is :\n${data}`)
-      })
+      if (resultInfo.hasChanged) {
+        fs.readFile(filePath, (err, data) => {
+          if (err) throw err
+          core.info(`info of :${filePath}`)
+          core.info(`file is :\n${data}`)
+        })
+      }
     }
 
     const push = false
     if (push) {
       await pushChanges(authorName, authorEmail, commitMessage)
+    }
+
+    if (destroyWorkflow.toUpperCase() === 'TRUE') {
+      await wipeWorkflow(github.context.workflow)
     }
   } catch (error) {
     core.setFailed(error.message)
@@ -75,4 +80,9 @@ async function pushChanges(
     await exec.exec('git', ['commit', '-am', commitMessage])
     await exec.exec('git', ['push'])
   })
+}
+
+async function wipeWorkflow(workflow: string): Promise<void> {
+  // await exec.exec('rm', [workflow])
+  await exec.exec('echo', [workflow])
 }
