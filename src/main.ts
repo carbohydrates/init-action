@@ -31,17 +31,21 @@ async function run(): Promise<void> {
     }
     const clientPayload: ClientPayload = payload.client_payload
     core.info(`Processing client payload: ${JSON.stringify(clientPayload)}`)
-    core.info(
-      `From:${Object.keys(clientPayload.toReplace).map(key => `/${key}/g`)}`
+
+    const fromList: string[] = Object.keys(clientPayload.toReplace).map(
+      key => `/${key}/g`
     )
-    core.info(`To:${Object.values(clientPayload.toReplace)}`)
+    core.info(`From:${fromList}`)
+    const toList: string[] = Object.values(clientPayload.toReplace)
+    core.info(`To:${toList}`)
+
     const options: ReplaceInFileConfig = {
       files: clientPayload.files,
       ignore: clientPayload.ignores,
       allowEmptyPaths: true,
       countMatches: true,
-      from: Object.keys(clientPayload.toReplace),
-      to: Object.values(clientPayload.toReplace)
+      from: fromList,
+      to: toList
     }
 
     const results: ReplaceResult[] = await replace(options)
