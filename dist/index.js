@@ -6298,7 +6298,7 @@ function run() {
             }
             const clientPayload = payload.client_payload;
             core.info(`Processing client payload: ${JSON.stringify(clientPayload)}`);
-            const fromList = Object.keys(clientPayload.toReplace);
+            const fromList = Object.keys(clientPayload.toReplace).map(key => new RegExp(key, 'g'));
             core.info(`From:${fromList}`);
             const toList = Object.values(clientPayload.toReplace);
             core.info(`To:${toList}`);
@@ -6341,6 +6341,7 @@ function pushChanges(authorName, authorEmail, commitMessage) {
         yield core.group('push changes', () => __awaiter(this, void 0, void 0, function* () {
             yield exec.exec('git', ['config', 'user.name', authorName]);
             yield exec.exec('git', ['config', 'user.email', authorEmail]);
+            yield exec.exec('git', ['add', '-u']);
             yield exec.exec('git', ['commit', '-am', commitMessage]);
             yield exec.exec('git', ['push']);
         }));
