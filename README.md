@@ -25,12 +25,12 @@ jobs:
 
 | key                     | value             | default               | description                                                                      |
 |-------------------------|-------------------|-----------------------|----------------------------------------------------------------------------------|
-| event_type              | any string        | 'init_action'         | event name, which this action will wait, the action will ignore any other events |
-| destroy_after_execution | 'true' or 'false' | 'true'                | if set to 'true', It will destroy the workflow where it will be executed         |
-| push_changes            | 'true' or 'false' | 'true'                | if set to 'true', The action will push the changes to the branch                 |
-| author_name             | any string        | 'initbot'             | Git author name of commit                                                        |
-| author_email            | any string        | 'initbot@example.com' | Git author-email                                                                 |
-| commit_message          | any string        | 'init action commit'  | Commit message                                                                   |
+| event_type              | `string`          | `init_action`         | event name, which this action will wait, the action will ignore any other events |
+| destroy_after_execution | `true` or `false` | `true`                | if set to 'true', It will destroy the workflow where it will be executed         |
+| push_changes            | `true` or `false` | `true`                | if set to 'true', The action will push the changes to the branch                 |
+| author_name             | `string`          | `initbot`             | Git author name of commit                                                        |
+| author_email            | `string`          | `initbot@example.com` | Git author-email                                                                 |
+| commit_message          | `string`          | `init action commit`  | Commit message                                                                   |
 
 *Important*: this action should live in the separate workflow
 
@@ -57,11 +57,11 @@ __Note: This event will only trigger a workflow run if the workflow file is on t
 
 | Name                     | Type                    | description                                                                                      |
 |--------------------------|-------------------------|--------------------------------------------------------------------------------------------------|
-| event_type               | string                  | Required: A custom webhook event name.                                                           |
-| client_payload           | object                  | JSON payload with extra information about the webhook event that your action or worklow may use. |
-| client_payload.files     | string[]                | Array of the file patterns that should be used for processing                                    |
-| client_payload.ignores   | string[]                | Array of the file patterns that should be excluded from processing                               |
-| client_payload.toReplace | {[key: string]: string} | Map of k,v where k replacing placeholder and v is value for this replacement  
+| event_type               | `string`                  | Required: A custom webhook event name.                                                           |
+| client_payload           | `object`                  | JSON payload with extra information about the webhook event that your action or worklow may use. |
+| client_payload.files     | `string[]`                | Array of the file patterns that should be used for processing                                    |
+| client_payload.ignores   | `string[]`                | Array of the file patterns that should be excluded from processing                               |
+| client_payload.toReplace | `{[key: string]: string}` | Map of k,v where k replacing placeholder and v is value for this replacement  
 
 
 ```bash
