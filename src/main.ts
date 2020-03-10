@@ -3,7 +3,6 @@ import * as github from '@actions/github'
 import * as exec from '@actions/exec'
 import {WebhookPayload} from '@actions/github/lib/interfaces'
 import replace, {ReplaceInFileConfig, ReplaceResult} from 'replace-in-file'
-import * as fs from 'fs'
 
 async function run(): Promise<void> {
   try {
@@ -49,16 +48,6 @@ async function run(): Promise<void> {
 
     const results: ReplaceResult[] = await replace(options)
     core.info(`results: ${JSON.stringify(results)}`)
-    for (const resultInfo of results) {
-      const filePath = resultInfo.file
-      if (resultInfo.hasChanged) {
-        fs.readFile(filePath, (err, data) => {
-          if (err) throw err
-          core.info(`info of :${filePath}`)
-          core.info(`file is :\n${data}`)
-        })
-      }
-    }
 
     if (destroyWorkflow.toUpperCase() === 'TRUE') {
       await wipeWorkflow(github.context.workflow)
@@ -80,6 +69,7 @@ async function pushChanges(
   commitMessage: string
 ): Promise<void> {
   await core.group('push changes', async () => {
+    await exec.exec('git', ['--diff'])
     await exec.exec('git', ['config', 'user.name', authorName])
     await exec.exec('git', ['config', 'user.email', authorEmail])
     await exec.exec('git', ['add', '-u'])
