@@ -10,7 +10,7 @@ See [action.yml](action.yml), [init-workflow](.github/workflows/init-workflow.ya
 ```yaml
 on: repository_dispatch
 jobs:
-  test: # make sure the action works on a clean machine without building
+  init: # make sure the action works on a clean machine without building
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
