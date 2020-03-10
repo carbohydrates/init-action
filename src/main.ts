@@ -69,7 +69,7 @@ async function pushChanges(
   commitMessage: string
 ): Promise<void> {
   await core.group('push changes', async () => {
-    await exec.exec('git', ['--diff'])
+    await exec.exec('git', ['diff'])
     await exec.exec('git', ['config', 'user.name', authorName])
     await exec.exec('git', ['config', 'user.email', authorEmail])
     await exec.exec('git', ['add', '-u'])
