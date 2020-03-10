@@ -60,12 +60,12 @@ async function run(): Promise<void> {
       }
     }
 
-    if (push.toUpperCase() === 'TRUE') {
-      await pushChanges(authorName, authorEmail, commitMessage)
-    }
-
     if (destroyWorkflow.toUpperCase() === 'TRUE') {
       await wipeWorkflow(github.context.workflow)
+    }
+
+    if (push.toUpperCase() === 'TRUE') {
+      await pushChanges(authorName, authorEmail, commitMessage)
     }
   } catch (error) {
     core.setFailed(error.message)

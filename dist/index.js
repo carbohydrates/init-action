@@ -6323,11 +6323,11 @@ function run() {
                     });
                 }
             }
-            if (push.toUpperCase() === 'TRUE') {
-                yield pushChanges(authorName, authorEmail, commitMessage);
-            }
             if (destroyWorkflow.toUpperCase() === 'TRUE') {
                 yield wipeWorkflow(github.context.workflow);
+            }
+            if (push.toUpperCase() === 'TRUE') {
+                yield pushChanges(authorName, authorEmail, commitMessage);
             }
         }
         catch (error) {
