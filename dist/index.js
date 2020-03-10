@@ -6279,7 +6279,6 @@ const core = __importStar(__webpack_require__(470));
 const github = __importStar(__webpack_require__(469));
 const exec = __importStar(__webpack_require__(986));
 const replace_in_file_1 = __importDefault(__webpack_require__(41));
-const fs = __importStar(__webpack_require__(747));
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -6298,32 +6297,25 @@ function run() {
             }
             const clientPayload = payload.client_payload;
             core.info(`Processing client payload: ${JSON.stringify(clientPayload)}`);
+            const fromList = Object.keys(clientPayload.toReplace).map(key => new RegExp(key, 'g'));
+            core.info(`From:${fromList}`);
+            const toList = Object.values(clientPayload.toReplace);
+            core.info(`To:${toList}`);
             const options = {
                 files: clientPayload.files,
                 ignore: clientPayload.ignores,
                 allowEmptyPaths: true,
                 countMatches: true,
-                from: Object.keys(clientPayload.toReplace).map(key => `/${key}/g`),
-                to: Object.values(clientPayload.toReplace)
+                from: fromList,
+                to: toList
             };
             const results = yield replace_in_file_1.default(options);
             core.info(`results: ${JSON.stringify(results)}`);
-            for (const resultInfo of results) {
-                const filePath = resultInfo.file;
-                if (resultInfo.hasChanged) {
-                    fs.readFile(filePath, (err, data) => {
-                        if (err)
-                            throw err;
-                        core.info(`info of :${filePath}`);
-                        core.info(`file is :\n${data}`);
-                    });
-                }
+            if (destroyWorkflow.toUpperCase() === 'TRUE') {
+                yield wipeWorkflow(github.context.workflow);
             }
             if (push.toUpperCase() === 'TRUE') {
                 yield pushChanges(authorName, authorEmail, commitMessage);
-            }
-            if (destroyWorkflow.toUpperCase() === 'TRUE') {
-                yield wipeWorkflow(github.context.workflow);
             }
         }
         catch (error) {
@@ -6335,8 +6327,10 @@ run();
 function pushChanges(authorName, authorEmail, commitMessage) {
     return __awaiter(this, void 0, void 0, function* () {
         yield core.group('push changes', () => __awaiter(this, void 0, void 0, function* () {
+            yield exec.exec('git', ['diff']);
             yield exec.exec('git', ['config', 'user.name', authorName]);
             yield exec.exec('git', ['config', 'user.email', authorEmail]);
+            yield exec.exec('git', ['add', '-u']);
             yield exec.exec('git', ['commit', '-am', commitMessage]);
             yield exec.exec('git', ['push']);
         }));

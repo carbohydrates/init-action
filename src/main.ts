@@ -3,7 +3,6 @@ import * as github from '@actions/github'
 import * as exec from '@actions/exec'
 import {WebhookPayload} from '@actions/github/lib/interfaces'
 import replace, {ReplaceInFileConfig, ReplaceResult} from 'replace-in-file'
-import * as fs from 'fs'
 
 async function run(): Promise<void> {
   try {
@@ -31,35 +30,31 @@ async function run(): Promise<void> {
     }
     const clientPayload: ClientPayload = payload.client_payload
     core.info(`Processing client payload: ${JSON.stringify(clientPayload)}`)
+    const fromList: RegExp[] = Object.keys(clientPayload.toReplace).map(
+      key => new RegExp(key, 'g')
+    )
+    core.info(`From:${fromList}`)
+    const toList: string[] = Object.values(clientPayload.toReplace)
+    core.info(`To:${toList}`)
 
     const options: ReplaceInFileConfig = {
       files: clientPayload.files,
       ignore: clientPayload.ignores,
       allowEmptyPaths: true,
       countMatches: true,
-      from: Object.keys(clientPayload.toReplace).map(key => `/${key}/g`),
-      to: Object.values(clientPayload.toReplace)
+      from: fromList,
+      to: toList
     }
 
     const results: ReplaceResult[] = await replace(options)
     core.info(`results: ${JSON.stringify(results)}`)
-    for (const resultInfo of results) {
-      const filePath = resultInfo.file
-      if (resultInfo.hasChanged) {
-        fs.readFile(filePath, (err, data) => {
-          if (err) throw err
-          core.info(`info of :${filePath}`)
-          core.info(`file is :\n${data}`)
-        })
-      }
+
+    if (destroyWorkflow.toUpperCase() === 'TRUE') {
+      await wipeWorkflow(github.context.workflow)
     }
 
     if (push.toUpperCase() === 'TRUE') {
       await pushChanges(authorName, authorEmail, commitMessage)
-    }
-
-    if (destroyWorkflow.toUpperCase() === 'TRUE') {
-      await wipeWorkflow(github.context.workflow)
     }
   } catch (error) {
     core.setFailed(error.message)
@@ -74,8 +69,10 @@ async function pushChanges(
   commitMessage: string
 ): Promise<void> {
   await core.group('push changes', async () => {
+    await exec.exec('git', ['diff'])
     await exec.exec('git', ['config', 'user.name', authorName])
     await exec.exec('git', ['config', 'user.email', authorEmail])
+    await exec.exec('git', ['add', '-u'])
     await exec.exec('git', ['commit', '-am', commitMessage])
     await exec.exec('git', ['push'])
   })
