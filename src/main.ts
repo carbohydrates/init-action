@@ -7,7 +7,7 @@ import * as fs from 'fs'
 
 async function run(): Promise<void> {
   try {
-    // const token: string = core.getInput('token')
+    const push: string = core.getInput('push_changes')
     const eventType: string = core.getInput('event_type')
     const authorName: string = core.getInput('author_name')
     const authorEmail: string = core.getInput('author_email')
@@ -54,8 +54,7 @@ async function run(): Promise<void> {
       }
     }
 
-    const push = false
-    if (push) {
+    if (push.toUpperCase() === 'TRUE') {
       await pushChanges(authorName, authorEmail, commitMessage)
     }
 
@@ -83,6 +82,6 @@ async function pushChanges(
 }
 
 async function wipeWorkflow(workflow: string): Promise<void> {
-  // await exec.exec('rm', [workflow])
-  await exec.exec('echo', [workflow])
+  core.info(`Deleting workflow`)
+  await exec.exec('rm', [workflow])
 }

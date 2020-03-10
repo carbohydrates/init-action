@@ -6,5 +6,6 @@ jobs:
       - uses: actions/checkout@v2
       - uses: ./
         with:
-          destroy_after_execution: "false"
-          token: "dfsdsdfdf"
+          destroy_after_execution: 'false'
+          event_type: 'init_action'
+          push_changes: 'false'

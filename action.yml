@@ -1,17 +1,18 @@
 name: init-action
-description: 'This action is used for one time automation. It took each key from client_payload and replace it to value'
+description: 'This action is used for one time automation. It took each key from client_payload.toReplace and replace it to value'
 author: carbohydrates
 inputs:
   event_type:
     description: 'event type that action will accept'
     required: true
     default: 'init_action'
-  token:
-    description: 'github Private access token from your repo, usually {{ secrets.GITHUB_TOKEN }}'
-    required: true
   destroy_after_execution:
-    required: true
     description: 'Destroy the workflow that contains this action after successful execution'
+    required: true
+    default: 'true'
+  push_changes:
+    description: 'push changes that were made by this action?'
+    required: true
     default: 'true'
   author_name:
     description: 'author_name of commit'

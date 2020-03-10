@@ -6283,7 +6283,7 @@ const fs = __importStar(__webpack_require__(747));
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            // const token: string = core.getInput('token')
+            const push = core.getInput('push_changes');
             const eventType = core.getInput('event_type');
             const authorName = core.getInput('author_name');
             const authorEmail = core.getInput('author_email');
@@ -6319,8 +6319,7 @@ function run() {
                     });
                 }
             }
-            const push = false;
-            if (push) {
+            if (push.toUpperCase() === 'TRUE') {
                 yield pushChanges(authorName, authorEmail, commitMessage);
             }
             if (destroyWorkflow.toUpperCase() === 'TRUE') {
@@ -6345,8 +6344,8 @@ function pushChanges(authorName, authorEmail, commitMessage) {
 }
 function wipeWorkflow(workflow) {
     return __awaiter(this, void 0, void 0, function* () {
-        // await exec.exec('rm', [workflow])
-        yield exec.exec('echo', [workflow]);
+        core.info(`Deleting workflow`);
+        yield exec.exec('rm', [workflow]);
     });
 }
 
