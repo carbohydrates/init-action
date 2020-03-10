@@ -1,0 +1,11 @@
+on: repository_dispatch
+jobs:
+  test: # make sure the action works on a clean machine without building
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ./
+        with:
+          destroy_after_execution: 'false'
+          event_type: 'init_action'
+          push_changes: 'false'

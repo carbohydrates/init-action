@@ -1,101 +1,74 @@
-<p align="center">
-  <a href="https://github.com/actions/typescript-action/actions"><img alt="typescript-action status" src="https://github.com/actions/typescript-action/workflows/build-test/badge.svg"></a>
-</p>
+# Init-action
 
-# Create a JavaScript Action using TypeScript
+This action is used for one time automation after repository creation.
+This will utilize dispatcher webhook for handling custom event payload.
 
-Use this template to bootstrap the creation of a JavaScript action.:rocket:
+## Usage
 
-This template includes compilication support, tests, a validation workflow, publishing, and versioning guidance.  
-
-If you are new, there's also a simpler introduction.  See the [Hello World JavaScript Action](https://github.com/actions/hello-world-javascript-action)
-
-## Create an action from this template
-
-Click the `Use this Template` and provide the new repo details for your action
-
-## Code in Master
-
-Install the dependencies  
-```bash
-$ npm install
-```
-
-Build the typescript and package it for distribution
-```bash
-$ npm run build && npm run pack
-```
-
-Run the tests :heavy_check_mark:  
-```bash
-$ npm test
-
- PASS  ./index.test.js
-  ✓ throws invalid number (3ms)
-  ✓ wait 500 ms (504ms)
-  ✓ test runs (95ms)
-
-...
-```
-
-## Change action.yml
-
-The action.yml contains defines the inputs and output for your action.
-
-Update the action.yml with your name, description, inputs and outputs for your action.
-
-See the [documentation](https://help.github.com/en/articles/metadata-syntax-for-github-actions)
-
-## Change the Code
-
-Most toolkit and CI/CD operations involve async operations so the action is run in an async function.
-
-```javascript
-import * as core from '@actions/core';
-...
-
-async function run() {
-  try { 
-      ...
-  } 
-  catch (error) {
-    core.setFailed(error.message);
-  }
-}
-
-run()
-```
-
-See the [toolkit documentation](https://github.com/actions/toolkit/blob/master/README.md#packages) for the various packages.
-
-## Publish to a distribution branch
-
-Actions are run from GitHub repos so we will checkin the packed dist folder. 
-
-Then run [ncc](https://github.com/zeit/ncc) and push the results:
-```bash
-$ npm run pack
-$ git add dist
-$ git commit -a -m "prod dependencies"
-$ git push origin releases/v1
-```
-
-Your action is now published! :rocket: 
-
-See the [versioning documentation](https://github.com/actions/toolkit/blob/master/docs/action-versioning.md)
-
-## Validate
-
-You can now validate the action by referencing `./` in a workflow in your repo (see [test.yml](.github/workflows/test.yml)])
+See [action.yml](action.yml), [init-workflow](.github/workflows/init-workflow.yaml)
 
 ```yaml
-uses: ./
-with:
-  milliseconds: 1000
+on: repository_dispatch
+jobs:
+  test: # make sure the action works on a clean machine without building
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ./
+        with:
+          destroy_after_execution: 'false'
+          event_type: 'init_action'
+          push_changes: 'false'
 ```
 
-See the [actions tab](https://github.com/actions/javascript-action/actions) for runs of this action! :rocket:
+## With parameters
 
-## Usage:
+| key                     | value             | default               | description                                                                      |
+|-------------------------|-------------------|-----------------------|----------------------------------------------------------------------------------|
+| event_type              | any string        | 'init_action'         | event name, which this action will wait, the action will ignore any other events |
+| destroy_after_execution | 'true' or 'false' | 'true'                | if set to 'true', It will destroy the workflow where it will be executed         |
+| push_changes            | 'true' or 'false' | 'true'                | if set to 'true', The action will push the changes to the branch                 |
+| author_name             | any string        | 'initbot'             | Git author name of commit                                                        |
+| author_email            | any string        | 'initbot@example.com' | Git author-email                                                                 |
+| commit_message          | any string        | 'init action commit'  | Commit message                                                                   |
 
-After testing you can [create a v1 tag](https://github.com/actions/toolkit/blob/master/docs/action-versioning.md) to reference the stable and latest V1 action
+*Important*: this action should live in the separate workflow
+
+
+## Triggering the action
+This action is triggered by custom API call https://help.github.com/en/actions/reference/events-that-trigger-workflows#external-events-repository_dispatch
+__Note: This event will only trigger a workflow run if the workflow file is on the master or default branch.__
+
+```yaml
+{
+	"event_type": "init_action", 
+	"client_payload": {
+		"files": ["**/*.yaml"],
+		"ignores": [],
+		"toReplace": {
+			"__PLACEHOLDER1__": "someValue1",
+			"__PLACEHOLDER2__": "someValue2",
+			"_placeholder1__" : "yaaaay"
+		}
+	}
+}
+```
+
+| Name                     | Type                    | description                                                                                      |
+|--------------------------|-------------------------|--------------------------------------------------------------------------------------------------|
+| event_type               | string                  | Required: A custom webhook event name.                                                           |
+| client_payload           | object                  | JSON payload with extra information about the webhook event that your action or worklow may use. |
+| client_payload.files     | string[]                | Array of the file patterns that should be used for processing                                    |
+| client_payload.ignores   | string[]                | Array of the file patterns that should be excluded from processing                               |
+| client_payload.toReplace | {[key: string]: string} | Map of k,v where k replacing placeholder and v is value for this replacement  
+
+
+```bash
+curl --request POST \
+  --url https://api.github.com/repos/carbohydrates/init-action/dispatches \
+  --header 'cache-control: no-cache' \
+  --header 'content-type: application/json' \
+  --data '{"event_type":"init_action","client_payload":{"files":["**/*.yaml"],"ignores":[],"toReplace":{"__PLACEHOLDER1__":"someValue1","__PLACEHOLDER2__":"someValue2","_placeholder1__":"yaaaay"}}}'
+```
+
+*NOTE:*For private repos you should use Basic Auth with private access token

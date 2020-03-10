@@ -1,10 +1,34 @@
-name: 'Your name here'
-description: 'Provide a description here'
-author: 'Your name or organization here'
+name: init-action
+description: 'This action is used for one time automation. It took each key from client_payload.toReplace and replace it to value'
+author: carbohydrates
 inputs:
-  myInput:              # change this
-    description: 'input description here'
-    default: 'default value if applicable'
+  event_type:
+    description: 'event type that action will accept'
+    required: true
+    default: 'init_action'
+  destroy_after_execution:
+    description: 'Destroy the workflow that contains this action after successful execution'
+    required: true
+    default: 'true'
+  push_changes:
+    description: 'push changes that were made by this action?'
+    required: true
+    default: 'true'
+  author_name:
+    description: 'author_name of commit'
+    required: true
+    default: 'initbot'
+  author_email:
+    description: 'git author email that will push changes'
+    required: true
+    default: 'initbot@example.com'
+  commit_message:
+    description: 'Commit message for changes'
+    required: true
+    default: 'init action commit'
 runs:
   using: 'node12'
   main: 'dist/index.js'
+branding:
+  color: gray-dark
+  icon: loader
