@@ -40,7 +40,7 @@ async function run(): Promise<void> {
       ignore: clientPayload.ignores,
       allowEmptyPaths: true,
       countMatches: true,
-      from: Object.keys(clientPayload.toReplace).map(key => `/${key}/g`),
+      from: Object.keys(clientPayload.toReplace),
       to: Object.values(clientPayload.toReplace)
     }
 
