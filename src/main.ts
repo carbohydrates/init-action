@@ -32,9 +32,7 @@ async function run(): Promise<void> {
     const clientPayload: ClientPayload = payload.client_payload
     core.info(`Processing client payload: ${JSON.stringify(clientPayload)}`)
 
-    const fromList: string[] = Object.keys(clientPayload.toReplace).map(
-      key => `/${key}/g`
-    )
+    const fromList: string[] = Object.keys(clientPayload.toReplace)
     core.info(`From:${fromList}`)
     const toList: string[] = Object.values(clientPayload.toReplace)
     core.info(`To:${toList}`)
