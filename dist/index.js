@@ -6298,6 +6298,8 @@ function run() {
             }
             const clientPayload = payload.client_payload;
             core.info(`Processing client payload: ${JSON.stringify(clientPayload)}`);
+            core.info(`From:${Object.keys(clientPayload.toReplace).map(key => `/${key}/g`)}`);
+            core.info(`To:${Object.values(clientPayload.toReplace)}`);
             const options = {
                 files: clientPayload.files,
                 ignore: clientPayload.ignores,
