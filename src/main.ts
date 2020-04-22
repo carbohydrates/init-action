@@ -72,7 +72,7 @@ async function pushChanges(
     await exec.exec('git', ['diff'])
     await exec.exec('git', ['config', 'user.name', authorName])
     await exec.exec('git', ['config', 'user.email', authorEmail])
-    await exec.exec('git', ['add', '-u'])
+    await exec.exec('git', ['add', '--all'])
     await exec.exec('git', ['commit', '-am', commitMessage])
     await exec.exec('git', ['push'])
   })
