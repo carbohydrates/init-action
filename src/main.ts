@@ -3,6 +3,7 @@ import * as github from '@actions/github'
 import * as exec from '@actions/exec'
 import {WebhookPayload} from '@actions/github/lib/interfaces'
 import replace, {ReplaceInFileConfig, ReplaceResult} from 'replace-in-file'
+import {ExecOptions} from "@actions/exec/lib/interfaces";
 
 async function run(): Promise<void> {
   try {
@@ -74,7 +75,21 @@ async function pushChanges(
     await exec.exec('git', ['config', 'user.email', authorEmail])
     await exec.exec('git', ['add', '--all'])
     await exec.exec('git', ['commit', '-am', commitMessage])
-    await exec.exec('git', ['push'])
+
+
+    let  currentBranch = ''
+    ExecOptions options = {
+      listeners
+    }
+
+
+    await exec.exec('git', ['branch', '--show-current'], options)
+    if (currentBranch !== branch){
+      await exec.exec('git', ['checkout', '-b', branch])
+      await exec.exec('git', ['push', '-u', 'origin', branch])
+    } else {
+      await exec.exec('git', ['push'])
+    }
   })
 }
 

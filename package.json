@@ -29,6 +29,7 @@
     "@actions/exec": "^1.0.3",
     "@actions/github": "^2.1.1",
     "@actions/glob": "^0.1.0",
+    "@octokit/rest": "^17.1.4",
     "fs-extra": "^8.1.0",
     "replace-in-file": "^5.0.2"
   },
