@@ -3,11 +3,14 @@ import * as github from '@actions/github'
 import * as exec from '@actions/exec'
 import {WebhookPayload} from '@actions/github/lib/interfaces'
 import replace, {ReplaceInFileConfig, ReplaceResult} from 'replace-in-file'
-import {ExecOptions} from "@actions/exec/lib/interfaces";
+import {ExecOptions} from '@actions/exec/lib/interfaces'
+import * as renamer from 'renamer'
 
 async function run(): Promise<void> {
   try {
     const push: string = core.getInput('push_changes')
+    const createPr: string = core.getInput('create_pr')
+    const token: string = core.getInput('token')
     const eventType: string = core.getInput('event_type')
     const authorName: string = core.getInput('author_name')
     const authorEmail: string = core.getInput('author_email')
@@ -29,6 +32,7 @@ async function run(): Promise<void> {
       ignores: string[]
       toReplace: {[key: string]: string}
     }
+
     const clientPayload: ClientPayload = payload.client_payload
     core.info(`Processing client payload: ${JSON.stringify(clientPayload)}`)
     const fromList: RegExp[] = Object.keys(clientPayload.toReplace).map(
@@ -54,46 +58,16 @@ async function run(): Promise<void> {
       await wipeWorkflow(github.context.workflow)
     }
 
-    if (push.toUpperCase() === 'TRUE') {
-      await pushChanges(authorName, authorEmail, commitMessage)
+    if (createPr.toUpperCase() === 'TRUE') {
+      prBranch = ''
+    } else {
+      prBranch = init - action - pr
     }
+
+    await pushChanges(authorName, authorEmail, commitMessage, createPr)
   } catch (error) {
     core.setFailed(error.message)
   }
 }
 
 run()
-
-async function pushChanges(
-  authorName: string,
-  authorEmail: string,
-  commitMessage: string
-): Promise<void> {
-  await core.group('push changes', async () => {
-    await exec.exec('git', ['diff'])
-    await exec.exec('git', ['config', 'user.name', authorName])
-    await exec.exec('git', ['config', 'user.email', authorEmail])
-    await exec.exec('git', ['add', '--all'])
-    await exec.exec('git', ['commit', '-am', commitMessage])
-
-
-    let  currentBranch = ''
-    ExecOptions options = {
-      listeners
-    }
-
-
-    await exec.exec('git', ['branch', '--show-current'], options)
-    if (currentBranch !== branch){
-      await exec.exec('git', ['checkout', '-b', branch])
-      await exec.exec('git', ['push', '-u', 'origin', branch])
-    } else {
-      await exec.exec('git', ['push'])
-    }
-  })
-}
-
-async function wipeWorkflow(workflow: string): Promise<void> {
-  core.info(`Deleting workflow`)
-  await exec.exec('rm', [workflow])
-}

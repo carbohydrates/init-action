@@ -25,3 +25,15 @@ test('test runs', () => {
 test('dummytest', async () => {
   console.log('dummy')
 })
+
+
+
+An example:
+
+// global.ts
+  export function abc() {
+  }
+
+// main.ts
+import { abc } from "./global"
+abc();
