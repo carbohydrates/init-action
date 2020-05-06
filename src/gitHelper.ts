@@ -1,6 +1,9 @@
 import * as core from '@actions/core'
 import * as exec from '@actions/exec'
+import * as github from '@actions/github'
+import {RequestOptions} from '@actions/github/lib/interfaces'
 import {ExecOptions} from '@actions/exec/lib/interfaces'
+import {GitHub} from "@actions/github";
 
 export async function pushChanges(
   authorName: string,
@@ -38,35 +41,33 @@ export async function pushChanges(
     }
   })
 }
-//
-// export async function createPr(
-//
-//   tergetBranch: string,
-//   destina: string,
-//   commitMessage: string,
-//   branch: string
-// ) {
-//
-//   title	string	Required. The title of the new pull request.
-//     head	string	Required. The name of the branch where your changes are implemented. For cross-repository pull requests in the same network, namespace head with a user like this: username:branch.
-//     base	string	Required. The name of the branch you want the changes pulled into. This should be an existing branch on the current repository. You cannot submit a pull request to one repository that requests a merge to a base of another repository.
-//     body	string	The contents of the pull request.
-//     maintainer_can_modify	boolean	Indicates whether maintainers can modify the pull request.
-//     draft
-// }
-//
-// const octokit = new github.GitHub("sss")
-// const proptions: Octokit.RequestOptions = {}
-// const prParams: Octokit.PullsCreateParams = {}
-// octokit.pulls.create()
-//
-// const {data: pullRequest} = await octokit.pulls.get({
-//   owner: 'octokit',
-//   repo: 'rest.js',
-//   pull_number: 123,
-//   mediaType: {
-//     format: 'diff'
-//   }
-// });
-//
-// console.log(pullRequest);
+
+export async function createPr(
+  token: string,
+  title: string,
+  head: string,
+  base: string,
+  body: string
+): Promise<string> {
+
+
+  const githubClient: GitHub = new github.GitHub(token)
+  const prOptions: Octokit.RequestOptions = {}
+  const prParams: Octokit.PullsCreateParams = {}
+
+  githubClient.pulls.create(prParams,)
+  octokit.pulls.create()
+
+  const {data: pullRequest} = await octokit.pulls.get({
+    owner: 'octokit',
+    repo: 'rest.js',
+    pull_number: 123,
+    mediaType: {
+      format: 'diff'
+    }
+  });
+
+  console.log(pullRequest);
+
+  return `ss`
+}
