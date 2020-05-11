@@ -5735,7 +5735,7 @@ function run() {
                 return;
             }
             const clientPayload = payload.client_payload;
-            core.info(`Processing client payload: ${JSON.stringify(clientPayload)}`);
+            yield core.group('Processing client payload', () => __awaiter(this, void 0, void 0, function* () { core.info(`Processing client payload: ${JSON.stringify(clientPayload)}`); }));
             yield replaceHelper_1.replace(clientPayload);
             if (destroyWorkflow.toUpperCase() === 'TRUE') {
                 yield commons_1.wipeWorkflow(github.context.workflow);

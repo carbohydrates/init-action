@@ -25,7 +25,9 @@ async function run(): Promise<void> {
     }
 
     const clientPayload: ClientPayload = payload.client_payload
-    core.info(`Processing client payload: ${JSON.stringify(clientPayload)}`)
+    await core.group('Processing client payload', async () => {
+      core.info(`Processing client payload: ${JSON.stringify(clientPayload)}`)
+    })
     await replace(clientPayload)
     if (destroyWorkflow.toUpperCase() === 'TRUE') {
       await wipeWorkflow(github.context.workflow)
