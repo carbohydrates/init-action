@@ -1,8 +1,8 @@
 {
-  "name": "typescript-action",
+  "name": "init-action",
   "version": "0.0.0",
   "private": true,
-  "description": "TypeScript template action",
+  "description": "init action",
   "main": "lib/main.js",
   "scripts": {
     "build": "tsc",
@@ -15,21 +15,25 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/actions/typescript-action.git"
+    "url": "git+https://github.com/carbohydrates/init-action.git"
   },
   "keywords": [
     "actions",
     "node",
     "setup"
   ],
-  "author": "YourNameOrOrganization",
+  "author": "carbohydrates",
   "license": "MIT",
   "dependencies": {
     "@actions/core": "^1.2.3",
     "@actions/exec": "^1.0.3",
     "@actions/github": "^2.1.1",
     "@actions/glob": "^0.1.0",
+    "@octokit/rest": "^17.1.4",
     "fs-extra": "^8.1.0",
+    "glob": "^7.1.6",
+    "globby": "^11.0.0",
+    "path": "^0.12.7",
     "replace-in-file": "^5.0.2"
   },
   "devDependencies": {

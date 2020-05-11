@@ -2,6 +2,9 @@ name: init-action
 description: 'This action is used for one time automation. It took each key from client_payload.toReplace and replace it to value'
 author: carbohydrates
 inputs:
+  token:
+    description: 'github private access token, usually secrets.GITHUB_TOKEN , needs only for pr creation'
+    required: false
   event_type:
     description: 'event type that action will accept'
     required: true
@@ -10,10 +13,10 @@ inputs:
     description: 'Destroy the workflow that contains this action after successful execution'
     required: true
     default: 'true'
-  push_changes:
-    description: 'push changes that were made by this action?'
+  create_pr:
+    description: 'create pr instead of direct pushing to master'
     required: true
-    default: 'true'
+    default: 'false'
   author_name:
     description: 'author_name of commit'
     required: true

@@ -5554,6 +5554,94 @@ module.exports = convert;
 
 /***/ }),
 
+/***/ 186:
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const core = __importStar(__webpack_require__(470));
+const exec = __importStar(__webpack_require__(986));
+const github = __importStar(__webpack_require__(469));
+function pushChanges(authorName, authorEmail, commitMessage, branch) {
+    return __awaiter(this, void 0, void 0, function* () {
+        yield core.group('push changes', () => __awaiter(this, void 0, void 0, function* () {
+            yield exec.exec('git', ['diff']);
+            yield exec.exec('git', ['config', 'user.name', authorName]);
+            yield exec.exec('git', ['config', 'user.email', authorEmail]);
+            yield exec.exec('git', ['add', '--all']);
+            yield exec.exec('git', ['commit', '-am', commitMessage]);
+            let currentBranch = '';
+            const options = {};
+            options.listeners = {
+                stdout: (data) => {
+                    currentBranch += data.toString();
+                }
+            };
+            yield exec.exec('git', ['branch', '--show-current'], options);
+            if (branch === currentBranch) {
+                core.info(`The current branch:${currentBranch} is the target branch:${branch}, push changes`);
+                yield exec.exec('git', ['push']);
+            }
+            else {
+                core.info(`The current branch:${currentBranch} is the different then the target branch:${branch}, going to create it and push changes`);
+                yield exec.exec('git', ['checkout', '-b', branch]);
+                yield exec.exec('git', ['push', '-u', 'origin', branch]);
+            }
+        }));
+    });
+}
+exports.pushChanges = pushChanges;
+function createPullRequest(token, title, head, base, body, repo, owner) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const octokit = new github.GitHub(token);
+        yield core.group('Creating pull request', () => __awaiter(this, void 0, void 0, function* () {
+            octokit.pulls
+                .create({
+                title,
+                body,
+                owner,
+                repo,
+                head,
+                base,
+                draft: false // When `true`, no notifications are generated
+            })
+                .then(response => {
+                core.info(`Pull request status is:${JSON.stringify(response.headers.status)}`);
+                if (response['status'] !== 201) {
+                    core.info(`response is:${JSON.stringify(response)}`);
+                    const errorMessage = [
+                        'Response status was not 201 (created), please check',
+                        '- configurations for your Action',
+                        '- authentication for repository (write permissions)'
+                    ];
+                    throw new Error(errorMessage.join('\n'));
+                }
+            });
+        }));
+    });
+}
+exports.createPullRequest = createPullRequest;
+
+
+/***/ }),
+
 /***/ 197:
 /***/ (function(module, __unusedexports, __webpack_require__) {
 
@@ -5623,18 +5711,17 @@ var __importStar = (this && this.__importStar) || function (mod) {
     result["default"] = mod;
     return result;
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 const core = __importStar(__webpack_require__(470));
 const github = __importStar(__webpack_require__(469));
-const exec = __importStar(__webpack_require__(986));
-const replace_in_file_1 = __importDefault(__webpack_require__(41));
+const commons_1 = __webpack_require__(238);
+const replaceHelper_1 = __webpack_require__(227);
+const gitHelper_1 = __webpack_require__(186);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const push = core.getInput('push_changes');
+            const createPr = core.getInput('create_pr');
+            const token = core.getInput('token');
             const eventType = core.getInput('event_type');
             const authorName = core.getInput('author_name');
             const authorEmail = core.getInput('author_email');
@@ -5648,26 +5735,21 @@ function run() {
                 return;
             }
             const clientPayload = payload.client_payload;
-            core.info(`Processing client payload: ${JSON.stringify(clientPayload)}`);
-            const fromList = Object.keys(clientPayload.toReplace).map(key => new RegExp(key, 'g'));
-            core.info(`From:${fromList}`);
-            const toList = Object.values(clientPayload.toReplace);
-            core.info(`To:${toList}`);
-            const options = {
-                files: clientPayload.files,
-                ignore: clientPayload.ignores,
-                allowEmptyPaths: true,
-                countMatches: true,
-                from: fromList,
-                to: toList
-            };
-            const results = yield replace_in_file_1.default(options);
-            core.info(`results: ${JSON.stringify(results)}`);
+            yield core.group('Processing client payload', () => __awaiter(this, void 0, void 0, function* () {
+                core.info(`Processing client payload: ${JSON.stringify(clientPayload)}`);
+            }));
+            yield replaceHelper_1.replace(clientPayload);
             if (destroyWorkflow.toUpperCase() === 'TRUE') {
-                yield wipeWorkflow(github.context.workflow);
+                yield commons_1.wipeWorkflow(github.context.workflow);
             }
-            if (push.toUpperCase() === 'TRUE') {
-                yield pushChanges(authorName, authorEmail, commitMessage);
+            if (createPr.toUpperCase() === 'TRUE') {
+                const prBranch = `init-action-changes-${process.env.GITHUB_RUN_ID}`;
+                yield gitHelper_1.pushChanges(authorName, authorEmail, commitMessage, prBranch);
+                const body = `This Pull request has been automatically created by init action, here you could find all changed that were made during repository initialization`;
+                yield gitHelper_1.createPullRequest(token, 'Init action Pull request', prBranch, 'master', body, github.context.repo.repo, github.context.repo.owner);
+            }
+            else {
+                yield gitHelper_1.pushChanges(authorName, authorEmail, commitMessage, 'master');
             }
         }
         catch (error) {
@@ -5676,24 +5758,6 @@ function run() {
     });
 }
 run();
-function pushChanges(authorName, authorEmail, commitMessage) {
-    return __awaiter(this, void 0, void 0, function* () {
-        yield core.group('push changes', () => __awaiter(this, void 0, void 0, function* () {
-            yield exec.exec('git', ['diff']);
-            yield exec.exec('git', ['config', 'user.name', authorName]);
-            yield exec.exec('git', ['config', 'user.email', authorEmail]);
-            yield exec.exec('git', ['add', '--all']);
-            yield exec.exec('git', ['commit', '-am', commitMessage]);
-            yield exec.exec('git', ['push']);
-        }));
-    });
-}
-function wipeWorkflow(workflow) {
-    return __awaiter(this, void 0, void 0, function* () {
-        core.info(`Deleting workflow`);
-        yield exec.exec('rm', [workflow]);
-    });
-}
 
 
 /***/ }),
@@ -5841,6 +5905,93 @@ module.exports = function parseConfig(config) {
   //Merge config with defaults
   return Object.assign({}, defaults, config);
 };
+
+
+/***/ }),
+
+/***/ 227:
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const core = __importStar(__webpack_require__(470));
+const replace_in_file_1 = __importDefault(__webpack_require__(41));
+function replace(clientPayload) {
+    return __awaiter(this, void 0, void 0, function* () {
+        core.info(`Doing replace in files`);
+        core.info(`Doing replace in filenames and folders`);
+        const fromList = Object.keys(clientPayload.toReplace).map(key => new RegExp(key, 'g'));
+        core.info(`From:${fromList}`);
+        const toList = Object.values(clientPayload.toReplace);
+        core.info(`To:${toList}`);
+        const options = {
+            files: clientPayload.files,
+            ignore: clientPayload.ignores,
+            allowEmptyPaths: true,
+            countMatches: true,
+            from: fromList,
+            to: toList
+        };
+        const results = yield replace_in_file_1.default(options);
+        core.info(`results: ${JSON.stringify(results)}`);
+    });
+}
+exports.replace = replace;
+
+
+/***/ }),
+
+/***/ 238:
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const core = __importStar(__webpack_require__(470));
+const exec = __importStar(__webpack_require__(986));
+function wipeWorkflow(workflowPath) {
+    return __awaiter(this, void 0, void 0, function* () {
+        core.info(`Deleting ${workflowPath}`);
+        yield exec.exec('rm', [workflowPath]);
+    });
+}
+exports.wipeWorkflow = wipeWorkflow;
 
 
 /***/ }),
