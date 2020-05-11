@@ -7,10 +7,22 @@ on: # rebuild any PRs and main branch changes
       - 'releases/*'
 
 jobs:
-  build: # make sure build/ci work properly
+  base: # make sure build/ci work properly
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
     - run: |
         npm install
         npm run all
+  bumpAndTag:
+    runs-on: ubuntu-latest
+    name: 'Bump and Tag'
+    needs: [base]
+    if: github.ref == 'refs/heads/master'
+    steps:
+      - uses: actions/checkout@v2
+      - name: "Bump version and push tag"
+        uses: anothrNick/github-tag-action@1b82315fa74a0572aa0bc1a96b859c57fc26e531
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          WITH_V: true
