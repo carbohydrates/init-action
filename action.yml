@@ -3,7 +3,7 @@ description: 'This action is used for one time automation. It took each key from
 author: carbohydrates
 inputs:
   token:
-    description: 'github private access token, usually ${{ secrets.GITHUB_TOKEN }}, needs only for pr creation'
+    description: 'github private access token, usually secrets.GITHUB_TOKEN , needs only for pr creation'
     required: false
   event_type:
     description: 'event type that action will accept'
