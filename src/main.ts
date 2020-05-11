@@ -32,7 +32,7 @@ async function run(): Promise<void> {
     }
 
     if (createPr.toUpperCase() === 'TRUE') {
-      const prBranch = `init-action-changes`
+      const prBranch = `init-action-changes-${process.env.GITHUB_RUN_ID}`
       await pushChanges(authorName, authorEmail, commitMessage, prBranch)
       const body = `This Pull request has been automatically created by init action, here you could find all changed that were made during repository initialization`
       await createPullRequest(

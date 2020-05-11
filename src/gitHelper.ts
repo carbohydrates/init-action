@@ -50,27 +50,32 @@ export async function createPullRequest(
   owner: string
 ): Promise<void> {
   const octokit = new github.GitHub(token)
-  octokit.pulls
-    .create({
-      title, // Commit title, generally should be less than 74 characters
-      body, // Multi-line commit message
-      owner, // Username or Organization with permissions to initialize Pull Request
-      repo, // GitHub repository link or hash eg. `fancy-project`
-      head, // Where changes are implemented, eg. `your-name:feature-branch`
-      base, // Branch name where changes should be incorporated, eg. `master`
-      draft: false // When `true`, no notifications are generated
-    })
-    .then(response => {
-      core.info(`response is:${JSON.stringify(response)}`)
+  await core.group('Creating pull request', async () => {
+    octokit.pulls
+      .create({
+        title, // Commit title, generally should be less than 74 characters
+        body, // Multi-line commit message
+        owner, // Username or Organization with permissions to initialize Pull Request
+        repo, // GitHub repository link or hash eg. `fancy-project`
+        head, // Where changes are implemented, eg. `your-name:feature-branch`
+        base, // Branch name where changes should be incorporated, eg. `master`
+        draft: false // When `true`, no notifications are generated
+      })
+      .then(response => {
+        core.info(
+          `Pull request status is:${JSON.stringify(response.headers.status)}`
+        )
 
-      if (response['status'] !== 201) {
-        const errorMessage = [
-          'Response status was not 201 (created), please check',
-          '- configurations for your Action',
-          '- authentication for repository (write permissions)'
-        ]
+        if (response['status'] !== 201) {
+          core.info(`response is:${JSON.stringify(response)}`)
+          const errorMessage = [
+            'Response status was not 201 (created), please check',
+            '- configurations for your Action',
+            '- authentication for repository (write permissions)'
+          ]
 
-        throw new Error(errorMessage.join('\n'))
-      }
-    })
+          throw new Error(errorMessage.join('\n'))
+        }
+      })
+  })
 }

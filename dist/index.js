@@ -5611,27 +5611,30 @@ exports.pushChanges = pushChanges;
 function createPullRequest(token, title, head, base, body, repo, owner) {
     return __awaiter(this, void 0, void 0, function* () {
         const octokit = new github.GitHub(token);
-        octokit.pulls
-            .create({
-            title,
-            body,
-            owner,
-            repo,
-            head,
-            base,
-            draft: false // When `true`, no notifications are generated
-        })
-            .then(response => {
-            core.info(`response is:${JSON.stringify(response)}`);
-            if (response['status'] !== 201) {
-                const errorMessage = [
-                    'Response status was not 201 (created), please check',
-                    '- configurations for your Action',
-                    '- authentication for repository (write permissions)'
-                ];
-                throw new Error(errorMessage.join('\n'));
-            }
-        });
+        yield core.group('Creating pull request', () => __awaiter(this, void 0, void 0, function* () {
+            octokit.pulls
+                .create({
+                title,
+                body,
+                owner,
+                repo,
+                head,
+                base,
+                draft: false // When `true`, no notifications are generated
+            })
+                .then(response => {
+                core.info(`Pull request status is:${JSON.stringify(response.headers.status)}`);
+                if (response['status'] !== 201) {
+                    core.info(`response is:${JSON.stringify(response)}`);
+                    const errorMessage = [
+                        'Response status was not 201 (created), please check',
+                        '- configurations for your Action',
+                        '- authentication for repository (write permissions)'
+                    ];
+                    throw new Error(errorMessage.join('\n'));
+                }
+            });
+        }));
     });
 }
 exports.createPullRequest = createPullRequest;
@@ -5738,7 +5741,7 @@ function run() {
                 yield commons_1.wipeWorkflow(github.context.workflow);
             }
             if (createPr.toUpperCase() === 'TRUE') {
-                const prBranch = `init-action-changes`;
+                const prBranch = `init-action-changes-${process.env.GITHUB_RUN_ID}`;
                 yield gitHelper_1.pushChanges(authorName, authorEmail, commitMessage, prBranch);
                 const body = `This Pull request has been automatically created by init action, here you could find all changed that were made during repository initialization`;
                 yield gitHelper_1.createPullRequest(token, 'Init action Pull request', prBranch, 'master', body, github.context.repo.repo, github.context.repo.owner);
