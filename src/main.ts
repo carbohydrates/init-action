@@ -2,14 +2,11 @@ import * as core from '@actions/core'
 import * as github from '@actions/github'
 import {wipeWorkflow} from './commons'
 import {WebhookPayload} from '@actions/github/lib/interfaces'
-import replace, {ReplaceInFileConfig, ReplaceResult} from 'replace-in-file'
-import {ExecOptions} from '@actions/exec/lib/interfaces'
-import * as renamer from 'renamer'
-import {ClientPayload} from './replaceHelper'
+import {ClientPayload, replace} from './replaceHelper'
+import {pushChanges, createPullRequest} from './gitHelper'
 
 async function run(): Promise<void> {
   try {
-    const push: string = core.getInput('push_changes')
     const createPr: string = core.getInput('create_pr')
     const token: string = core.getInput('token')
     const eventType: string = core.getInput('event_type')
@@ -18,7 +15,6 @@ async function run(): Promise<void> {
     const commitMessage: string = core.getInput('commit_message')
     const destroyWorkflow: string = core.getInput('destroy_after_execution')
     const payload: WebhookPayload = github.context.payload
-
     core.info(`Processing payload`)
     core.debug(`Payload is : ${JSON.stringify(payload)}`)
     if (eventType !== payload.action) {
@@ -30,21 +26,27 @@ async function run(): Promise<void> {
 
     const clientPayload: ClientPayload = payload.client_payload
     core.info(`Processing client payload: ${JSON.stringify(clientPayload)}`)
-
-
-
-
+    await replace(clientPayload)
     if (destroyWorkflow.toUpperCase() === 'TRUE') {
       await wipeWorkflow(github.context.workflow)
     }
 
     if (createPr.toUpperCase() === 'TRUE') {
-      prBranch = ''
+      const prBranch = `init-action-changes`
+      await pushChanges(authorName, authorEmail, commitMessage, prBranch)
+      const body = `This Pull request has been automatically created by init action, here you could find all changed that were made during repository initialization`
+      await createPullRequest(
+        token,
+        'Init action Pull request',
+        prBranch,
+        'master',
+        body,
+        github.context.repo.repo,
+        github.context.repo.owner
+      )
     } else {
-      prBranch = init - action - pr
+      await pushChanges(authorName, authorEmail, commitMessage, 'master')
     }
-
-    await pushChanges(authorName, authorEmail, commitMessage, createPr)
   } catch (error) {
     core.setFailed(error.message)
   }

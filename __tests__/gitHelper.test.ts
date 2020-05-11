@@ -1,7 +1,6 @@
-import * as process from "process";
-import * as path from "path";
-import * as cp from "child_process";
-
+import * as process from 'process'
+import * as path from 'path'
+import * as cp from 'child_process'
 
 test('test runs', () => {
   process.env['INPUT_MILLISECONDS'] = '500'

@@ -1,9 +1,7 @@
 import * as core from '@actions/core'
 import * as exec from '@actions/exec'
 import * as github from '@actions/github'
-import {RequestOptions} from '@actions/github/lib/interfaces'
 import {ExecOptions} from '@actions/exec/lib/interfaces'
-import {GitHub} from "@actions/github";
 
 export async function pushChanges(
   authorName: string,
@@ -42,32 +40,37 @@ export async function pushChanges(
   })
 }
 
-export async function createPr(
+export async function createPullRequest(
   token: string,
   title: string,
   head: string,
   base: string,
-  body: string
-): Promise<string> {
+  body: string,
+  repo: string,
+  owner: string
+): Promise<void> {
+  const octokit = new github.GitHub(token)
+  octokit.pulls
+    .create({
+      title, // Commit title, generally should be less than 74 characters
+      body, // Multi-line commit message
+      owner, // Username or Organization with permissions to initialize Pull Request
+      repo, // GitHub repository link or hash eg. `fancy-project`
+      head, // Where changes are implemented, eg. `your-name:feature-branch`
+      base, // Branch name where changes should be incorporated, eg. `master`
+      draft: false // When `true`, no notifications are generated
+    })
+    .then(response => {
+      core.info(`response is:${JSON.stringify(response)}`)
 
+      if (response['status'] !== 201) {
+        const errorMessage = [
+          'Response status was not 201 (created), please check',
+          '- configurations for your Action',
+          '- authentication for repository (write permissions)'
+        ]
 
-  const githubClient: GitHub = new github.GitHub(token)
-  const prOptions: Octokit.RequestOptions = {}
-  const prParams: Octokit.PullsCreateParams = {}
-
-  githubClient.pulls.create(prParams,)
-  octokit.pulls.create()
-
-  const {data: pullRequest} = await octokit.pulls.get({
-    owner: 'octokit',
-    repo: 'rest.js',
-    pull_number: 123,
-    mediaType: {
-      format: 'diff'
-    }
-  });
-
-  console.log(pullRequest);
-
-  return `ss`
+        throw new Error(errorMessage.join('\n'))
+      }
+    })
 }
