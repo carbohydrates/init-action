@@ -14,26 +14,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: carbohydrates/init-action@v1
+      - uses: carbohydrates/init-action@v3
         with:
           destroy_after_execution: 'false'
-          event_type: 'init_action'
-          push_changes: 'false'
 ```
-
-## With parameters
-
-| key                     | value             | default               | description                                                                      |
-|-------------------------|-------------------|-----------------------|----------------------------------------------------------------------------------|
-| event_type              | `string`          | `init_action`         | event name, which this action will wait, the action will ignore any other events |
-| destroy_after_execution | `true` or `false` | `true`                | if set to 'true', It will destroy the workflow where it will be executed         |
-| push_changes            | `true` or `false` | `true`                | if set to 'true', The action will push the changes to the branch                 |
-| author_name             | `string`          | `initbot`             | Git author name of commit                                                        |
-| author_email            | `string`          | `initbot@example.com` | Git author-email                                                                 |
-| commit_message          | `string`          | `init action commit`  | Commit message                                                                   |
-
-*Important*: this action should live in the separate workflow
-
 
 ## Triggering the action
 This action is triggered by custom API call https://help.github.com/en/actions/reference/events-that-trigger-workflows#external-events-repository_dispatch.
